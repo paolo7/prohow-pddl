@@ -1,0 +1,16 @@
+(define (problem sample)
+  (:domain prohow)
+  (:objects
+   t a b r x - task
+   e ee - environment
+   ex1 ex2 ex3 - execution
+   )
+  (:init
+    (has_goal e t)
+    (requires t r)
+    (has_step t a ) (has_step t b )   
+    (has_method b x) 
+    (primitive a) (primitive x) (primitive r) 
+   )
+  (:goal (finished e) )
+)
