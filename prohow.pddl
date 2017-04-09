@@ -6,9 +6,9 @@
 
   (:predicates 
   ; unary predicates
-  (task ?x) (execution ?x) (environment ?x) (success ?x) (failure ?x) (finished ?x) (primitive ?x)
+  (task ?x) (execution ?x) (environment ?x) (success ?x) (failure ?x) (finished ?x) (primitive ?x) (active ?x)
   ; binary predicates
-  (requires ?x ?y) (requires_one ?y ?x) (has_step ?y ?x) (has_method ?y ?x) (has_task ?y ?x) (has_goal ?y ?x) (binds ?y ?x) (has_constant ?y ?x) (has_value ?y ?x)  (has_env ?y ?x) (sub_env ?y ?x) (complete ?y ?x)  (failed ?y ?x)  (ready ?y ?x)  (related ?y ?x)  
+  (requires ?x ?y) (requires_one ?y ?x) (has_step ?y ?x) (has_method ?y ?x) (has_task ?y ?x) (has_goal ?y ?x) (binds ?y ?x) (has_constant ?y ?x) (has_value ?y ?x)  (has_env ?y ?x) (sub_env ?y ?x) (complete ?y ?x)  (failed ?y ?x)  (ready ?y ?x)  (related ?y ?x) (infer_active ?x)
   ; ternary predicates
   (value ?y ?x ?z) 
   )
@@ -35,7 +35,7 @@
       (has_task ?i ?t)
     )
   )
-    
+  
   (:action instantiate_sub_env
     :parameters (?e - environment ?a - environment ?t - task ?m - task)
     :precondition(and
@@ -57,8 +57,25 @@
         (has_goal ?e ?t)
       )
   )
-   
-
+  
+  (:action infer_active
+    :parameters (?e - environment)
+    :precondition (and 
+      (exists (?g) (has_goal ?e ?g))
+      (or (not (exists (?a) (sub_env ?e ?a)))
+        (exists (?a ?x) 
+          (and 
+            (sub_env ?e ?a)
+            (has_goal ?e ?x)
+            (ready ?x ?a)
+            (active ?a)
+          )
+        )
+      )
+    )
+    :effect (active ?e)
+  )  
+  
   (:action infer_complete
     :parameters (?y - task ?e - environment)
     :precondition (exists (?i)
@@ -119,6 +136,7 @@
   (:action infer_ready_by_requirements
     :parameters (?y - task ?e - environment)
     :precondition (and
+      (active ?e)
       (or
         (not 
           (exists (?x)
@@ -253,3 +271,5 @@
     )
   )
 )
+
+
