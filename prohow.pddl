@@ -133,26 +133,10 @@
     :effect (complete ?y ?e)
   )  
   
-  (:action infer_ready_by_requirements
+  (:action infer_ready
     :parameters (?y - task ?e - environment)
     :precondition (and
       (active ?e)
-      (or
-        (not 
-          (exists (?x)
-            (and
-              (requires ?y ?x)
-              (not (complete ?x ?e))
-            )
-          )
-        )
-        (exists (?x)
-            (and
-              (requires_one ?y ?x)
-              (complete ?x ?e)
-            )
-        )
-      )
       (or 
         (not
           (exists (?x)
@@ -164,6 +148,33 @@
             (has_step ?x ?y)
             (ready ?x ?e)
           )
+        )
+      )
+      (or
+        (not 
+          (exists (?x)
+            (or
+              (requires ?y ?x)
+              (requires_one ?y ?x)
+            )
+          )
+        )
+        (and
+          (exists (?x) (requires ?y ?x))
+          (not 
+            (exists (?x)
+              (and
+                (requires ?y ?x)
+                (not (complete ?x ?e))
+              )
+            )
+          )
+        )
+        (exists (?x)
+            (and
+              (requires_one ?y ?x)
+              (complete ?x ?e)
+            )
         )
       )
     )
